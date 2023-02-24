@@ -452,24 +452,18 @@ module.exports = grammar({
             field('function', choice(
                 ...FUNCTIONS.map(f => token.immediate(f))
             )),
-            optional(WS),
             $.arguments,
+            optional(WS),
             ')'
         ),
 
-        arguments: $ => seq(
+        arguments: $ => repeat(seq(
+            WS,
             $.argument,
-            optional(WS),
-            repeat(seq(
-                ',',
-                optional(WS),
-                $.argument,
-                optional(WS),
-            ))
-        ),
+        )),
 
         argument: $ => choice(
-            $.word,
+            //$.word,
             $._variable,
             $._function,
             $.string,
