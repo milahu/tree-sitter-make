@@ -68,8 +68,11 @@ $(error something bad happened)
 
 (makefile
   (function_call
+    (ERROR
+      (arguments
+        (argument
+          (word)))
+      (word))
     (arguments
       (argument
-        (word)
-        (word)
         (word)))))
