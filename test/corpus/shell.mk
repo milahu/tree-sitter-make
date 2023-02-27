@@ -42,15 +42,17 @@ v = $(shell echo foo$ bar)
   (variable_assignment
     name: (word)
     value: (text
-      (variable_reference
-        (ERROR)
-        (word))))
+      (shell_function
+        (shell_command
+          (variable_reference
+            (word))))))
   (variable_assignment
     name: (word)
     value: (text
-      (variable_reference
-        (ERROR)
-        (word)))))
+      (shell_function
+        (shell_command
+          (variable_reference
+            (word)))))))
 
 ================================================================================
 Shell function, escaped delimiter '\)'
