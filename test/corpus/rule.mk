@@ -239,7 +239,7 @@ Rule, recipe, empty rule
 target: ;
 
 target:
-	
+
 
 --------------------------------------------------------------------------------
 
@@ -250,8 +250,7 @@ target:
     (recipe))
   (rule
     (targets
-      (word))
-    (recipe)))
+      (word))))
 
 ================================================================================
 Rule, recipe, single line
@@ -268,7 +267,6 @@ target:
     (recipe
       (recipe_line
         (shell_text)))))
-
 
 ================================================================================
 Rule, recipe, single line, suppress echoing
@@ -392,11 +390,12 @@ Rule, recipe, single line, splited, backslash (sed)
 target:
 	sed -e 's/\([^-]*-g\)/r\1/'
 
----
+--------------------------------------------------------------------------------
 
 (makefile
   (rule
-    (targets (word))
+    (targets
+      (word))
     (recipe
       (recipe_line
         (shell_text)))))
@@ -448,7 +447,7 @@ target:
 ================================================================================
 Rule, recipe, multiple lines, whitespace after ":"
 ================================================================================
-all:   
+all:
 	@echo foo\
 	bar
 
@@ -550,7 +549,7 @@ target:
 	bar\
 bar"
 
-	
+
 	echo "foobar"
 
 target: ;

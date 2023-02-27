@@ -21,9 +21,8 @@ endif
       arg0: (string
         string: (function_call
           (ERROR
-            (arguments
-              (argument
-                (word)))
+            (argument
+              (word))
             (word))
           (arguments
             (argument
