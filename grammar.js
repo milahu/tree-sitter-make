@@ -244,9 +244,8 @@ module.exports = grammar({
         ),
 
         // 6.5
-        // TODO make sure this will not match RECIPEPREFIX
         variable_assignment: $ => seq(
-            //optional($._target_or_pattern_assignment),
+            optional($._target_or_pattern_assignment),
             $._name,
             //$._variable_assignment_name,
             optional(WS),
