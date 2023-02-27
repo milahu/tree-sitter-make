@@ -76,10 +76,10 @@ module.exports = grammar({
         $._string,
     ],
 
+    // tokens that may appear anywhere in the language
     extras: $ => [
         /[\s]/,
         alias(token(seq('\\',/\r?\n|\r/)), '\\'),
-        $.comment
     ],
 
     conflicts: $ => [],
@@ -92,6 +92,7 @@ module.exports = grammar({
         makefile: $ => repeat($._thing),
 
         _thing: $ => choice(
+            $.comment,
             $.rule,
             $._variable_definition,
             $._directive,
@@ -180,6 +181,7 @@ module.exports = grammar({
         )),
 
         _raw_recipe_line: $ => choice(
+            $.comment,
             $.conditional,
             $._prefixed_recipe_line
         ),
@@ -619,6 +621,7 @@ module.exports = grammar({
         ),
         // }}}
 
+        // TODO comments must start at start of line
         comment: $ => token(prec(-1,/#.*/)),
 
     }
