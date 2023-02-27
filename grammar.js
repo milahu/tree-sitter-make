@@ -481,6 +481,9 @@ module.exports = grammar({
             ))
         ),
 
+        // TODO use external scanner?
+        // split arguments by , but not \,
+        // end arguments with ) but not \)
         arguments: $ => seq(
             $.argument,
             repeat(seq(
@@ -490,10 +493,15 @@ module.exports = grammar({
         ),
 
         argument: $ => choice(
+            // no. this can be ANYTHING except comma
+            // TODO: parse correct arity for each function
+            // example: error function has 1 argument -> $(error a,b,c) has 1 argument "a,b,c"
+            // example: shell function has 1 argument
+            // example: subst function has 3 arguments -> 1,2,3,4,5 -> "1" "2" "3,4,5"
             $.word,
             $._variable,
             $._function,
-            $.string,
+            //$.string, // no. arguments are delimited ONLY by comma
         ),
 
         // 8.13
