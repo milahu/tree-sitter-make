@@ -621,9 +621,11 @@ module.exports = grammar({
         ),
         // }}}
 
-        // TODO comments must start at start of line
-        comment: $ => token(prec(-1,/#.*/)),
-
+        // note: comments must start at start of line
+        comment: $ => seq(
+            token(prec(-1,/#.*/)),
+            NL
+        ),
     }
 
 });
