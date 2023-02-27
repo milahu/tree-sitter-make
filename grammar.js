@@ -50,6 +50,17 @@ const FUNCTIONS = [
 module.exports = grammar({
     name: 'make',
 
+    externals: $ => [
+        $._recipeprefix,
+        $._recipeprefix_assignment_operator,
+        $._recipeprefix_assignment_value,
+        /*
+        $._variable_assignment_name,
+        $._variable_assignment_operator,
+        $._variable_assignment_value,
+        */
+    ],
+
     word: $ => $.word,
 
     inline: $ => [
@@ -160,19 +171,18 @@ module.exports = grammar({
             seq(
                 $._attached_recipe_line,
                 NL,
-                repeat(choice(
-                    $.conditional,
-                    $._prefixed_recipe_line,
-                ))
+                repeat($._raw_recipe_line)
             ),
             seq(
                 NL,
-                repeat1(choice(
-                    $.conditional,
-                    $._prefixed_recipe_line
-                ))
+                repeat1($._raw_recipe_line)
             ),
         )),
+
+        _raw_recipe_line: $ => choice(
+            $.conditional,
+            $._prefixed_recipe_line
+        ),
 
         _attached_recipe_line: $ => seq(
             ';',
@@ -205,7 +215,8 @@ module.exports = grammar({
         // Variables {{{
         _variable_definition: $ => choice(
             $.VPATH_assignment,
-            $.RECIPEPREFIX_assignment,
+            //$.recipeprefix_assignment,
+            prec(2, $.recipeprefix_assignment), // higher precedence than variable_assignment
             $.variable_assignment,
             $.shell_assignment,
             $.define_directive
@@ -220,22 +231,28 @@ module.exports = grammar({
             NL
         ),
 
-        RECIPEPREFIX_assignment: $ => seq(
+        recipeprefix_assignment: $ => seq(
             field('name','.RECIPEPREFIX'),
             optional(WS),
-            field('operator',choice(...DEFINE_OPS)),
-            field('value', $.text),
+            //field('operator',choice(...DEFINE_OPS)),
+            field('operator', $._recipeprefix_assignment_operator),
+            //field('value', $.text),
+            field('value', $._recipeprefix_assignment_value),
             NL
         ),
 
         // 6.5
+        // TODO make sure this will not match RECIPEPREFIX
         variable_assignment: $ => seq(
-            optional($._target_or_pattern_assignment),
+            //optional($._target_or_pattern_assignment),
             $._name,
+            //$._variable_assignment_name,
             optional(WS),
             field('operator',choice(...DEFINE_OPS)),
+            //field('operator', $._variable_assignment_operator),
             optional(WS),
             optional(field('value', $.text)),
+            //optional(field('value', $._variable_assignment_value)),
             NL
         ),
 
@@ -398,11 +415,15 @@ module.exports = grammar({
         ),
 
         variable_reference: $ => seq(
-            choice('$','$$'),
+            //choice('$','$$'),
+            // $$(echo hello) == $(shell echo hello)
+            // $${asdf} == ?
+            // $${a b} == error: bad substitution
+            '$',
             choice(
                 delimitedVariable($._primary),
                 // TODO are those legal? $) $$$
-                alias(token.immediate(/./), $.word), // match any single digit
+                //alias(token.immediate(/./), $.word), // match any single digit
                 //alias(token.immediate('\\\n'), $.word)
             )
         ),
@@ -443,38 +464,55 @@ module.exports = grammar({
         // Functions {{{
         _function: $ => choice(
             $.function_call,
-            $.shell_function,
+            $._shell_function,
         ),
 
+        // TODO $$(echo hello) is a shell call == $(shell echo hello)
+        // TODO $${foo bar} is error: bad substitution
         function_call: $ => seq(
-            choice('$','$$'),
-            token.immediate('('),
-            field('function', choice(
-                ...FUNCTIONS.map(f => token.immediate(f))
-            )),
-            $.arguments,
-            optional(WS),
-            ')'
+            '$',
+            delimitedVariable(seq(
+                field('function', choice(
+                    ...FUNCTIONS.map(f => token.immediate(f))
+                )),
+                WS,
+                $.arguments,
+            ))
         ),
 
-        arguments: $ => repeat(seq(
-            WS,
+        arguments: $ => seq(
             $.argument,
-        )),
+            repeat(seq(
+                ',',
+                $.argument,
+            ))
+        ),
 
         argument: $ => choice(
-            //$.word,
+            $.word,
             $._variable,
             $._function,
             $.string,
         ),
 
         // 8.13
+        _shell_function: $ => choice(
+            $.shell_function,
+            // FIXME conflict
+            //$.shell_expression,
+        ),
         shell_function: $ => seq(
-            choice('$','$$'),
+            '$',
             token.immediate('('),
             field('function', 'shell'),
             optional(WS),
+            // TODO use external scanner
+            $._shell_command,
+            ')'
+        ),
+        shell_expression: $ => seq(
+            '$$',
+            token.immediate('('),
             $._shell_command,
             ')'
         ),
@@ -541,7 +579,7 @@ module.exports = grammar({
         // }}}
         // Tokens {{{
         // TODO external parser for .RECIPEPREFIX
-        _recipeprefix: $ => '\t',
+        //_recipeprefix: $ => '\t',
 
         // TODO prefixed line in define is recipe
         _rawline: $ => token(/.*[\r\n]+/), // any line
@@ -623,4 +661,6 @@ function text($, text, fenced_vars) {
             optional(raw_text)
         )
     )
+
+
 }
