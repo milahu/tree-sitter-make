@@ -16,7 +16,7 @@
 
 namespace {
 
-using std::vector;
+//using std::vector;
 
 
 
@@ -24,12 +24,12 @@ enum TokenType {
   RECIPEPREFIX,
   RECIPEPREFIX_ASSIGNMENT_OPERATOR,
   RECIPEPREFIX_ASSIGNMENT_VALUE,
-  #if false
+  /*
   RECIPEPREFIX_VALUE,
   VARIABLE_ASSIGNMENT_NAME,
   VARIABLE_ASSIGNMENT_OPERATOR,
   VARIABLE_ASSIGNMENT_VALUE,
-  #endif
+  */
 };
 
 
@@ -254,18 +254,16 @@ struct Scanner {
 
 
 
-  #if false
+  /*
   bool scan_variable_assignment_name(TSLexer *lexer) {
 
     if (DEBUG) printf("scanner.cc:90: valid_symbols[VARIABLE_ASSIGNMENT_NAME]\n");
 
     variable_name = "";
-    /*
     // skip whitespace
-    while (iswspace(lookahead(lexer))) {
-      skip(lexer);
-    }
-    */
+    //while (iswspace(lookahead(lexer))) {
+    //  skip(lexer);
+    //}
     // skip newlines
     char next_char = lookahead(lexer);
     deadloop_counter = 0;
@@ -336,11 +334,11 @@ struct Scanner {
     lexer->result_symbol = VARIABLE_ASSIGNMENT_NAME;
     return true;
   }
-  #endif
+  */
 
 
 
-  #if false
+  /*
   bool scan_variable_assignment_value(TSLexer *lexer) {
 
     if (DEBUG) printf("scanner.cc:160: valid_symbols[VARIABLE_ASSIGNMENT_VALUE]\n");
@@ -388,7 +386,7 @@ struct Scanner {
     lexer->result_symbol = VARIABLE_ASSIGNMENT_VALUE;
     return true;
   }
-  #endif
+  */
 
 
 
@@ -662,78 +660,3 @@ void tree_sitter_make_external_scanner_deserialize(
 }
 
 } // extern "C"
-
-
-
-#if false
-
-static void eval (struct ebuffer *buffer, int flags);
-
-
-
-static struct goaldep *
-eval_makefile (const char *filename, unsigned short flags)
-{
-  struct ebuffer ebuf;
-
-  ebuf.floc.filenm = filename; /* Use the original file name.  */
-  ebuf.floc.lineno = 1;
-  ebuf.floc.offset = 0;
-
-  ENULLLOOP (ebuf.fp, fopen (filename, "r"));
-
-  /* Evaluate the makefile */
-
-  ebuf.size = 200;
-  ebuf.buffer = ebuf.bufnext = ebuf.bufstart = xmalloc (ebuf.size);
-
-  curfile = reading_file;
-  reading_file = &ebuf.floc;
-
-  eval (&ebuf, !(flags & RM_NO_DEFAULT_GOAL));
-
-  reading_file = curfile;
-
-  fclose (ebuf.fp);
-
-  free (ebuf.bufstart);
-  free_alloca ();
-}
-
-
-
-/* Read file FILENAME as a makefile and add its contents to the data base.
-
-   SET_DEFAULT is true if we are allowed to set the default goal.  */
-
-static void
-eval (struct ebuffer *ebuf, int set_default)
-{
-  char *collapsed = 0;
-  size_t collapsed_length = 0;
-  size_t commands_len = 200;
-  char *commands;
-  size_t commands_idx = 0;
-  unsigned int cmds_started, tgts_started;
-  int ignoring = 0, in_ignored_define = 0;
-  int no_targets = 0;           /* Set when reading a rule without targets.  */
-  int also_make_targets = 0;    /* Set when reading grouped targets. */
-  struct nameseq *filenames = 0;
-  char *depstr = 0;
-  long nlines = 0;
-  int two_colon = 0;
-  char prefix = cmd_prefix;
-  const char *pattern = 0;
-  const char *pattern_percent;
-  floc *fstart;
-  floc fi;
-
-  pattern_percent = 0;
-  cmds_started = tgts_started = 1;
-
-  fstart = &ebuf->floc;
-  fi.filenm = ebuf->floc.filenm;
-
-  commands = xmalloc (200);
-
-#endif
